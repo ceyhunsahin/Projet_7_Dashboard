@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import base64
 import time
-
+import os
+import sys
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
@@ -20,8 +21,8 @@ import xgboost as xgb
 
 # importer les datasets(normal, normalisée) et model
 path = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/Projet_File'
-path2 = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/'
-df_test = pd.read_csv(f'{path}/test_sample_data_home_risk.csv', encoding='unicode_escape')
+path2 = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard'
+df_test = pd.read_csv(path + '/test_sample_data_home_risk.csv', encoding='unicode_escape')
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
@@ -30,17 +31,27 @@ df_test_normalize = pd.read_csv (path + '/test_sample_data_home_risk_normalisée
                                  index_col=0)
 
 model = xgb.XGBClassifier ()
-model.load_model(f"{path2}pipeline_housing.json")
+model.load_model(path2 +"/pipeline_housing.json")
 
 
 # std_scale = joblib.load(path2+"std_scale_joblib.pkl")
 
+def find_data_file(filename):
+    if getattr(sys, 'frozen', False):
+        # The application is frozen
+        datadir = os.path.dirname(sys.executable)
+    else:
+        # The application is not frozen
+        # Change this bit to match where you store your data files:
+        datadir = os.path.dirname(__file__)
+    return os.path.join(datadir, filename)
 
 BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 # Initialize the app
 app = dash.Dash (__name__, external_stylesheets=[BS], suppress_callback_exceptions=True, update_title='Loading...',
                  meta_tags=[{ 'name': 'viewport',
-                              'content': 'width=device-width, initial-scale=2.0, maximum-scale=1.2, minimum-scale=0.5' }],
+                              'content': 'width=device-width, initial-scale=2.0, maximum-scale=1.2, minimum-scale=0.5' },
+                            ],assets_folder=find_data_file('assets/')
                  )
 server = app.server
 app.config.suppress_callback_exceptions = True
@@ -67,7 +78,7 @@ TIMEOUT = 60
 @cache.memoize (timeout=TIMEOUT)
 def query_data():
     # This approach works well if there is one dataset that is used to update several callbacks.
-    url_api_model_result = 'http://127.0.0.1:5001/scores'
+    url_api_model_result = 'http://127.0.0.1:5000/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': 100030 })
     total_score = ''
     get_request.raise_for_status ()
@@ -794,7 +805,7 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
 
     if 'result_dem' not in [i['value'] for i in feat_cl]:
         return no_update
-    url_api_model_result = 'http://127.0.0.1:5001/scores'
+    url_api_model_result = 'http://127.0.0.1:5000/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': client_id })
     get_request.raise_for_status ()
     score, data = '', ''
