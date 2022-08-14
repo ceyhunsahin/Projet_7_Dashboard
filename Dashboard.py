@@ -19,8 +19,8 @@ import xgboost as xgb
 
 
 # importer les datasets(normal, normalisée) et model
-path = '/Users/ceyhun/OPENCLASSROOM/PROJET_7_2/Projet_File'
-path2 = '/Users/ceyhun/OPENCLASSROOM/PROJET_7_2/'
+path = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/Projet_File'
+path2 = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/'
 df_test = pd.read_csv(f'{path}/test_sample_data_home_risk.csv', encoding='unicode_escape')
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
@@ -45,9 +45,9 @@ app = dash.Dash (__name__, external_stylesheets=[BS], suppress_callback_exceptio
 server = app.server
 app.config.suppress_callback_exceptions = True
 
-image_filename_1 = '../summary_plot3.png'  # replace with your own image
+image_filename_1 = 'summary_plot3.png'  # replace with your own image
 encoded_image_1 = base64.b64encode (open (image_filename_1, 'rb').read ())
-image_filename_2 = '../summary_plot4.png'  # replace with your own image
+image_filename_2 = 'summary_plot4.png'  # replace with your own image
 encoded_image_2 = base64.b64encode (open (image_filename_2, 'rb').read ())
 
 
