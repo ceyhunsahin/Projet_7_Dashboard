@@ -979,4 +979,4 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
 
 
 if __name__ == '__main__':
-    app.run_server (debug=False)
+    app.run_server (port=8050, debug=False)
