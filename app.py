@@ -23,6 +23,7 @@ import xgboost as xgb
 path = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/Projet_File'
 path2 = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard'
 df_test = pd.read_csv(path + '/test_sample_data_home_risk.csv', encoding='unicode_escape')
+print('dftest', df_test)
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
@@ -567,19 +568,18 @@ collapse4 = html.Div (
 # app layout general
 app.layout = html.Div (
     [
+        dcc.Location(id='url', refresh=False),
+        html.Div(id='page-content_base'),
         dcc.Store (id='side_click'),
-        sidebar,
-        content,
-        collapse,
-        client_content,
-        collapse2,
-        resultat_de_demande,
-        collapse3,
-        client_analyse,
-        collapse4,
-        # html.Div(id='datatable-interactivity-container')
     ],
 )
+
+@app.callback(Output('page-content_base', 'children'),
+              Input('url', 'pathname'))
+def display_page(pathname):
+    if pathname == '/':
+        return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
+
 
 
 # sidebar function
@@ -598,6 +598,8 @@ app.layout = html.Div (
 )
 def toggle_sidebar(n, n1, nclick):
     q1 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
+    if nclick is None :
+        raise PreventUpdate
     if q1 == 'btn_sidebar':
         sidebar_style = SIDEBAR_HIDEN
         content_style = CONTENT_STYLE1
@@ -805,6 +807,7 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
 
     if 'result_dem' not in [i['value'] for i in feat_cl]:
         return no_update
+
     url_api_model_result = 'http://127.0.0.1:5000/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': client_id })
     get_request.raise_for_status ()
