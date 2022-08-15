@@ -20,9 +20,13 @@ import xgboost as xgb
 
 
 # importer les datasets(normal, normalisée) et model
-path = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard/Projet_File'
-path2 = '/Users/ceyhun/OPENCLASSROOM/pythonProject_P7_Dashboard'
-df_test = pd.read_csv(path + '/test_sample_data_home_risk.csv', encoding='unicode_escape')
+path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk.csv'
+path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
+path2 = 'https://github.com/ceyhunsahin/Projet_7_Dashboard/blob/master/pipeline_housing.json'
+
+df_test = pd.read_csv(path, encoding='unicode_escape', index_col=0)
+
+
 print('dftest', df_test)
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
