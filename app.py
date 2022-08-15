@@ -22,9 +22,9 @@ import xgboost as xgb
 # importer les datasets(normal, normalisée) et model
 path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk.csv'
 path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
-path2 = 'https://github.com/ceyhunsahin/Projet_7_Dashboard/blob/master/pipeline_housing.json'
+path3 = 'pipeline_housing.json'
 
-df_test = pd.read_csv(path, encoding='unicode_escape', index_col=0)
+df_test = pd.read_csv(path, encoding='unicode_escape')
 
 
 print('dftest', df_test)
@@ -32,12 +32,11 @@ print('dftest', df_test)
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
 
-df_test_normalize = pd.read_csv (path + '/test_sample_data_home_risk_normalisée.csv', encoding='unicode_escape',
-                                 index_col=0)
+df_test_normalize = pd.read_csv (path2, index_col=0)
 
 model = xgb.XGBClassifier ()
-model.load_model(path2 +"/pipeline_housing.json")
-
+model.load_model(path3)
+print(model)
 
 # std_scale = joblib.load(path2+"std_scale_joblib.pkl")
 
