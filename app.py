@@ -7,7 +7,9 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
+import plotly.express as px
 import requests
 import shap
 from dash import dash_table  # #
@@ -20,8 +22,8 @@ import xgboost as xgb
 
 
 # importer les datasets(normal, normalisée) et model
-path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk.csv'
-path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
+path = 'Projet_File/test_sample_data_home_risk.csv'
+path2 = 'Projet_File/test_sample_data_home_risk_normalise.csv'
 path3 = 'pipeline_housing.json'
 
 df_test = pd.read_csv(path, encoding='unicode_escape')
@@ -82,7 +84,7 @@ TIMEOUT = 60
 @cache.memoize (timeout=TIMEOUT)
 def query_data():
     # This approach works well if there is one dataset that is used to update several callbacks.
-    url_api_model_result = 'http://127.0.0.1:5000/scores'
+    url_api_model_result = 'http://127.0.0.1:5002/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': 100030 })
     total_score = ''
     get_request.raise_for_status ()
@@ -355,7 +357,7 @@ client_content = html.Div (id="page-content_client", children=[
 
     dcc.Loading (id='demande_graph_loading2', type='cube',
                      children=[html.Div (
-                         dcc.Graph (id='graph_client_waterfall', config=config,
+                         dcc.Graph (id='graph_client_waterfall', config=config,style={'height' : 700},
                                     figure={
                                         'layout': { 'legend': { 'tracegroupgap': 0 },
 
@@ -500,7 +502,7 @@ client_analyse = html.Div ([
               style={ 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'space-evenly' }),
 
     dcc.Loading (id='bivarie_graph_loading', type='cube',
-                 children=[html.Div (dcc.Graph (id='bivarie_graph', config=config), )]),
+                 children=[html.Div (dcc.Graph (id='bivarie_graph', config=config, style={'height' : 700}), )]),
 
     html.H2 ([
         html.I ("Analyse univariée")],
@@ -540,7 +542,7 @@ client_analyse = html.Div ([
 
 
     dcc.Loading (id='univarie_graph_loading', type='cube',
-                 children=[html.Div (dcc.Graph (id='univarie_graph', config=config), )]),
+                 children=[html.Div (dcc.Graph (id='univarie_graph', config=config,style={'height' : 700}), )]),
 ],
 
     id="cl_analy",
@@ -572,6 +574,7 @@ collapse4 = html.Div (
 app.layout = html.Div (
     [
         dcc.Location(id='url', refresh=False),
+        sidebar,
         html.Div(id='page-content_base'),
         dcc.Store (id='side_click'),
     ],
@@ -581,7 +584,7 @@ app.layout = html.Div (
               Input('url', 'pathname'))
 def display_page(pathname):
     if pathname == '/':
-        return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
+        return content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
 
 
 
@@ -601,14 +604,16 @@ def display_page(pathname):
 )
 def toggle_sidebar(n, n1, nclick):
     q1 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
-    if nclick is None :
-        raise PreventUpdate
+    #if nclick ==  None :
+       # raise PreventUpdate
+    print(q1)
+
     if q1 == 'btn_sidebar':
         sidebar_style = SIDEBAR_HIDEN
         content_style = CONTENT_STYLE1
         cur_nclick = "HIDDEN"
         return sidebar_style, content_style, cur_nclick, { 'visibility': 'visible' }, CONTENT_STYLE1
-    else:
+    else :
         sidebar_style = SIDEBAR_STYLE
         content_style = CONTENT_STYLE
         cur_nclick = 'SHOW'
@@ -690,11 +695,11 @@ def toggle_collapse4(n, is_open):
     [Input ('stades_client', 'value'), Input ('pret_id', 'value'),
      Input ("btn_sidebar", "n_clicks"), Input ("btn_sidebar2", "n_clicks")], )
 def update_table_client_visibility(tick1, cl_id, sd1, sd2):
-    if cl_id is None:
+    if cl_id == None:
         raise PreventUpdate
     q1 = dash.callback_context.triggered[0]["value"]
     q2 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
-    if cl_id is not None:
+    if cl_id != None:
         if not tick1:
             return CONTENT_STYLE_client, CONTENT_STYLE_client
         if 'don_client' not in tick1:
@@ -711,10 +716,10 @@ def update_table_client_visibility(tick1, cl_id, sd1, sd2):
     [Input ('stades_client', 'value'), Input ('pret_id', 'value'),
      Input ("btn_sidebar", "n_clicks"), Input ("btn_sidebar2", "n_clicks")], )
 def update_demo_visibility(tick1, cl_id, sd1, sd2):
-    if cl_id is None:
+    if cl_id == None:
         raise PreventUpdate
     q2 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
-    if cl_id is not None:
+    if cl_id != None:
         if not tick1:
             return CONTENT_STYLE_client, CONTENT_STYLE_client
 
@@ -732,10 +737,10 @@ def update_demo_visibility(tick1, cl_id, sd1, sd2):
     [Input ('stades_client', 'value'), Input ('pret_id', 'value'),
      Input ("btn_sidebar", "n_clicks"), Input ("btn_sidebar2", "n_clicks")], )
 def update_analyse_visibility(tick1, cl_id, sd1, sd2):
-    if cl_id is None:
+    if cl_id == None:
         raise PreventUpdate
     q2 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
-    if cl_id is not None:
+    if cl_id != None:
         if not tick1:
             return CONTENT_STYLE_client, CONTENT_STYLE_client
 
@@ -754,7 +759,7 @@ def update_analyse_visibility(tick1, cl_id, sd1, sd2):
     [Input ('pret_id', 'value'), Input ('features_client', 'value')]
 )
 def update_table_client(client_id, sel_col):
-    if client_id is None:
+    if client_id == None:
         raise PreventUpdate
     value = f"Données du client, demande '{client_id}'"
     df_client = df_test[df_test['SK_ID_CURR'] == client_id]
@@ -767,7 +772,7 @@ def update_table_client(client_id, sel_col):
                Input ('pret_id', 'value'),
                Input ('features_client', 'value'))
 def graph_client(cl_id, feat_state):
-    if cl_id is None:
+    if cl_id == None:
         raise PreventUpdate
     df_client = df_test_normalize[df_test_normalize.index == cl_id]
     time.sleep (1)
@@ -804,14 +809,14 @@ def graph_client(cl_id, feat_state):
     Input ('stades_client', 'options'), Input ('pret_id', 'value'),
 )
 def result_client(feat_cl, client_id):  # sourcery no-metrics
-    if client_id is None:
+    if client_id == None:
         raise PreventUpdate
 
 
     if 'result_dem' not in [i['value'] for i in feat_cl]:
         return no_update
 
-    url_api_model_result = 'http://127.0.0.1:5000/scores'
+    url_api_model_result = 'http://127.0.0.1:5002/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': client_id })
     get_request.raise_for_status ()
     score, data = '', ''
@@ -882,7 +887,7 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
     [Input ('stades_client', 'options'), Input ('pret_id', 'value')],
 )
 def result_client2(f1, f2, feat_cl, client_id):
-    if feat_cl is None:
+    if feat_cl == None:
         raise PreventUpdate
 
     ctx = dash.callback_context
@@ -944,38 +949,55 @@ def select_graph(type_gr):
      Input ('pret_id', 'value'),Input ('type_graph', 'value')],
 )
 def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
-    if feat_cl is None or client_id is None:
+    if feat_cl == None or client_id == None:
         raise PreventUpdate
 
     if 'analyse_client' in [i['value'] for i in feat_cl]:
 
         total_score = query_data ()
         fig3 = go.Figure ()
-        fig4 = go.Figure ()
+        #fig4 = go.Figure ()
         if type_gr == 'Boxplot':
+
             for idx, col in enumerate (total_score[uni_f1].columns, 0):
+                for ind, pre in enumerate (total_score['Predict'].unique ()):
 
-                fig3.add_trace(go.Scatter (x =[col], y=total_score[total_score.index == str(client_id)][col], name=f"{col} : {client_id}"))
-                fig3.add_trace ( go.Box (y=total_score[col],  name=f"{col}"))
+
+
+                    val = total_score[total_score.index == str (client_id)]['Predict'].values
+
+                    df_plot_acc = total_score[total_score['Predict'] == pre]
+                    if val == pre :
+                        fig3.add_trace (
+                            go.Scatter (x=[col], y=df_plot_acc[df_plot_acc.index == str (client_id)][col],
+                                        name=f"{client_id}"))
+
+                        fig3.add_trace (go.Box (y=df_plot_acc[col], name=f"{col}"))
+                        fig3.update_layout (boxmode='overlay', xaxis_tickangle=0,
+                                            title = 'Tous les clients par rapport au acceptées et refusées',
+                                            yaxis_title = 'Valeurs Normalisée', xaxis_title = 'Features')
+
+                    else :
+                        fig3.add_trace (go.Box (y=df_plot_acc[col], name=f"{col}: Refusée" ))
+
             return fig3
+
+
+
         else :
+            total_score['Acc_Ref'] = np.where(total_score['Predict']==0, 'Acceptée','Refusée')
+            fig4 = px.histogram(total_score, x=uni_f1, color="Acc_Ref", marginal="rug",
+                                color_discrete_sequence = ['blue','red'],
+                                )
+            #fig4.add_trace (go.Histogram(x=df_plot[uni_f1], name=f"{uni_f1}"))
+            fig4.add_trace (go.Histogram (x=total_score[total_score.index == str (client_id)][uni_f1],
 
-            fig4.add_trace (go.Histogram(x=total_score[uni_f1],name=f"{uni_f1}"))
-            fig4.add_trace (go.Scatter (x=total_score[uni_f1], y=total_score[total_score.index == str (client_id)][uni_f1],
-                                        name=f"{uni_f1} : {client_id}"))
+                                        name=f"{uni_f1} : {client_id}",marker  = { 'color' : '#330C73' }))
 
-
+            fig3.update_layout (title='Tous les clients ')
 
 
             return fig4
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
