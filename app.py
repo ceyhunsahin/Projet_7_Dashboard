@@ -20,7 +20,6 @@ from dash.exceptions import PreventUpdate
 from flask_caching import Cache
 import xgboost as xgb
 
-
 # importer les datasets(normal, normalisée) et model
 path = 'Projet_File/test_sample_data_home_risk.csv'
 path2 = 'Projet_File/test_sample_data_home_risk_normalise.csv'
@@ -575,16 +574,10 @@ app.layout = html.Div (
     [
         dcc.Location(id='url', refresh=False),
         sidebar,
-        html.Div(id='page-content_base'),
+        content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
         dcc.Store (id='side_click'),
     ],
 )
-
-@app.callback(Output('page-content_base', 'children'),
-              Input('url', 'pathname'))
-def display_page(pathname):
-    if pathname == '/':
-        return content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
 
 
 
