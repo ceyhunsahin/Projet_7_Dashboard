@@ -20,6 +20,7 @@ from dash.exceptions import PreventUpdate
 from flask_caching import Cache
 import xgboost as xgb
 
+
 # importer les datasets(normal, normalisée) et model
 path = 'Projet_File/test_sample_data_home_risk.csv'
 path2 = 'Projet_File/test_sample_data_home_risk_normalise.csv'
@@ -41,25 +42,19 @@ print(model)
 
 # std_scale = joblib.load(path2+"std_scale_joblib.pkl")
 
-def find_data_file(filename):
-    if getattr(sys, 'frozen', False):
-        # The application is frozen
-        datadir = os.path.dirname(sys.executable)
-    else:
-        # The application is not frozen
-        # Change this bit to match where you store your data files:
-        datadir = os.path.dirname(__file__)
-    return os.path.join(datadir, filename)
+
 
 BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 # Initialize the app
 app = dash.Dash (__name__, external_stylesheets=[BS], suppress_callback_exceptions=True, update_title='Loading...',
                  meta_tags=[{ 'name': 'viewport',
                               'content': 'width=device-width, initial-scale=2.0, maximum-scale=1.2, minimum-scale=0.5' },
-                            ],assets_folder=find_data_file('assets/')
+                            ]
                  )
 server = app.server
 app.config.suppress_callback_exceptions = True
+
+app._favicon = ("assets/favicon.ico")
 
 image_filename_1 = 'summary_plot3.png'  # replace with your own image
 encoded_image_1 = base64.b64encode (open (image_filename_1, 'rb').read ())
@@ -77,7 +72,7 @@ cache = Cache (app.server, config={
     # higher numbers will store more data in the filesystem / redis cache
     'CACHE_THRESHOLD': 200
 })
-TIMEOUT = 60
+TIMEOUT = 300
 
 
 @cache.memoize (timeout=TIMEOUT)
@@ -104,7 +99,7 @@ SIDEBAR_STYLE = {
     "height": "100%",
     "z-index": 1,
     "overflow-x": "hidden",
-    "transition": "all 0.5s",
+    "transition": "all 1s",
     "padding": "0.5rem 1rem",
     "background-color": "#f8f9fa",
 }
@@ -118,7 +113,7 @@ SIDEBAR_HIDEN = {
     "height": "100%",
     "z-index": 1,
     "overflow-x": "hidden",
-    "transition": "all 0.5s",
+    "transition": "all 1s",
     "padding": "0rem 0rem",
     "background-color": "#f8f9fa",
 }
@@ -131,6 +126,7 @@ CONTENT_STYLE = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
     "width": "70%",
+    "transition": "all 1s"
     # "background-color": "#f8f9fa",
 }
 
@@ -139,7 +135,8 @@ CONTENT_STYLE_client = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
     "width": "70%",
-    'visibility': 'hidden'
+    'visibility': 'hidden',
+    "transition": "all 1s"
     # "background-color": "#f8f9fa",
 }
 
@@ -149,6 +146,7 @@ CONTENT_STYLE1 = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
     "width": "100%",
+    "transition": "all 1s"
     # "background-color": "#f8f9fa",
 }
 
@@ -158,6 +156,7 @@ CONTENT_STYLE1_client = {
     "margin-right": "2rem",
     "padding": "2rem 1rem",
     "width": "100%",
+    "transition": "all 1s"
     # "background-color": "#f8f9fa",
 }
 # graph capabilities
@@ -273,6 +272,7 @@ content = html.Div ([
 
     ),
     html.Div (id='datatable-interactivity-container'),
+    html.Div (id='hidden_data', children = [] , style = {'visibility': 'hidden'}),
 
 ],
 
@@ -573,12 +573,16 @@ collapse4 = html.Div (
 app.layout = html.Div (
     [
         dcc.Location(id='url', refresh=False),
-        sidebar,
-        content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
+        html.Div(id='page-content_base'),
         dcc.Store (id='side_click'),
     ],
 )
 
+@app.callback(Output('page-content_base', 'children'),
+              Input('url', 'pathname'))
+def display_page(pathname):
+    if pathname == '/':
+        return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
 
 
 # sidebar function
@@ -589,28 +593,35 @@ app.layout = html.Div (
         Output ("side_click", "data"),
         Output ("btn_sidebar2", "style"),
         Output ("collapse_id", "style"),
+        Output ("hidden_data", "children")
 
     ],
 
     [Input ("btn_sidebar", "n_clicks"), Input ("btn_sidebar2", "n_clicks")],
-    [State ("side_click", "data")]
+    [State ("side_click", "data"),State ("hidden_data", "children")]
 )
-def toggle_sidebar(n, n1, nclick):
+def toggle_sidebar(n, n1, nclick, hidden):
     q1 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
-    #if nclick ==  None :
-       # raise PreventUpdate
-    print(q1)
 
-    if q1 == 'btn_sidebar':
-        sidebar_style = SIDEBAR_HIDEN
-        content_style = CONTENT_STYLE1
-        cur_nclick = "HIDDEN"
-        return sidebar_style, content_style, cur_nclick, { 'visibility': 'visible' }, CONTENT_STYLE1
+    if q1 == 'btn_sidebar' :
+        hidden.append('btn_sidebar')
+
+        if len(hidden) == 1:
+
+            sidebar_style = SIDEBAR_STYLE
+            content_style = CONTENT_STYLE
+            cur_nclick = 'SHOW'
+            return sidebar_style, content_style, cur_nclick, { 'visibility': 'hidden' }, CONTENT_STYLE, hidden
+        elif len(hidden) > 1:
+            sidebar_style = SIDEBAR_HIDEN
+            content_style = CONTENT_STYLE1
+            cur_nclick = "HIDDEN"
+            return sidebar_style, content_style, cur_nclick, { 'visibility': 'visible' }, CONTENT_STYLE1, hidden
     else :
         sidebar_style = SIDEBAR_STYLE
         content_style = CONTENT_STYLE
         cur_nclick = 'SHOW'
-        return sidebar_style, content_style, cur_nclick, { 'visibility': 'hidden' }, CONTENT_STYLE
+        return sidebar_style, content_style, cur_nclick, { 'visibility': 'hidden' }, CONTENT_STYLE, hidden
 
 
 # first datatable function
@@ -722,6 +733,7 @@ def update_demo_visibility(tick1, cl_id, sd1, sd2):
             return CONTENT_STYLE1_client, CONTENT_STYLE1_client
         marge = { "margin-left": "30rem", 'visibility': 'visible' }
         return marge, marge
+    else : return no_update
 
 
 @app.callback (
@@ -743,6 +755,8 @@ def update_analyse_visibility(tick1, cl_id, sd1, sd2):
             return CONTENT_STYLE1_client, CONTENT_STYLE1_client
         marge = { "margin-left": "30rem", 'visibility': 'visible' }
         return marge, marge
+    else:
+        return no_update
 
 
 @app.callback (
@@ -991,6 +1005,9 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
 
 
             return fig4
+
+    else:
+        return no_update
 
 
 if __name__ == '__main__':
