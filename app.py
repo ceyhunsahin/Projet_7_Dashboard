@@ -77,7 +77,7 @@ TIMEOUT = 300
 @cache.memoize (timeout=TIMEOUT)
 def query_data():
     # This approach works well if there is one dataset that is used to update several callbacks.
-    url_api_model_result = 'http://127.0.0.1:5002/scores'
+    url_api_model_result = 'https://oc-p7-home-risk-flaskapi.herokuapp.com/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': 100030 })
     total_score = ''
     get_request.raise_for_status ()
@@ -822,7 +822,7 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
     if 'result_dem' not in [i['value'] for i in feat_cl]:
         return no_update
 
-    url_api_model_result = 'http://127.0.0.1:5002/scores'
+    url_api_model_result = 'https://oc-p7-home-risk-flaskapi.herokuapp.com/scores'
     get_request = requests.get (url=url_api_model_result, params={ 'index': client_id })
     get_request.raise_for_status ()
     score, data = '', ''
