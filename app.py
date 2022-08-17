@@ -20,9 +20,10 @@ import xgboost as xgb
 
 
 # importer les datasets(normal, normalisée) et model
-path = 'Projet_File/test_sample_data_home_risk.csv'
-path2 = 'Projet_File/test_sample_data_home_risk_normalise.csv'
+path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk.csv'
+path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
 path3 = 'pipeline_housing.json'
+
 
 df_test = pd.read_csv(path, encoding='unicode_escape')
 
@@ -1009,4 +1010,4 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
 
 
 if __name__ == '__main__':
-    app.run_server (port=8050, debug=False)
+    app.run_server (port=8051, debug=False)
