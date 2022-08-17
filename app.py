@@ -30,10 +30,10 @@ df_test = pd.read_csv(path, encoding='unicode_escape')
 
 print('dftest', df_test)
 
-df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
+df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')][:1000]
 df_test = df_test.sort_values ('SK_ID_CURR')
 
-df_test_normalize = pd.read_csv (path2, index_col=0)
+df_test_normalize = pd.read_csv (path2, index_col=0)[:1000]
 
 model = xgb.XGBClassifier ()
 model.load_model(path3)
