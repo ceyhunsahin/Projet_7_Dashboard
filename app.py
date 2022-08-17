@@ -26,22 +26,17 @@ path3 = 'pipeline_housing.json'
 
 
 df_test = pd.read_csv(path, encoding='unicode_escape')
+df_test = df_test.sample(1200, random_state=42)
 
-
-print('dftest', df_test)
-
-df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')][:1000]
+df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
 
-df_test_normalize = pd.read_csv (path2, index_col=0)[:1000]
+df_test_normalize = pd.read_csv (path2, index_col=0)
+df_test_normalize = df_test_normalize.sample(1200, random_state=42)
+
 
 model = xgb.XGBClassifier ()
 model.load_model(path3)
-print(model)
-
-# std_scale = joblib.load(path2+"std_scale_joblib.pkl")
-
-
 
 BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
 # Initialize the app
@@ -78,7 +73,7 @@ TIMEOUT = 300
 def query_data():
     # This approach works well if there is one dataset that is used to update several callbacks.
     url_api_model_result = 'https://oc-p7-home-risk-flaskapi.herokuapp.com/scores'
-    get_request = requests.get (url=url_api_model_result, params={ 'index': 100030 })
+    get_request = requests.get (url=url_api_model_result, params={ 'index': 100111 })
     total_score = ''
     get_request.raise_for_status ()
     if get_request.status_code != 204:
@@ -832,7 +827,6 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
 
     score *= 100
     score = round (score, 2)
-    print (score)
 
     value1 = f"Demande de prêt ID: '{client_id}'"
     value2 = f"Probabilité de défaut de remboursement: {score:,.2f}%"
