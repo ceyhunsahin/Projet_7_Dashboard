@@ -17,28 +17,30 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from flask_caching import Cache
 import xgboost as xgb
+from design import SIDEBAR_STYLE, SIDEBAR_HIDEN,CONTENT_STYLE, CONTENT_STYLE_client,CONTENT_STYLE1,CONTENT_STYLE1_client
 
 
-# importer les datasets(normal, normalisée) et model
+# import datasets(normal, normalise) and model
+# we use github repo for get the datasets
 path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk.csv'
 path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
 path3 = 'pipeline_housing.json'
 
-
+# Sample 1200 for df_test
 df_test = pd.read_csv(path, encoding='unicode_escape')
 df_test = df_test.sample(1200, random_state=42)
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
-
+# Sample 1200 for df_test_normalize
 df_test_normalize = pd.read_csv (path2, index_col=0)
 df_test_normalize = df_test_normalize.sample(1200, random_state=42)
 
-
+# import model
 model = xgb.XGBClassifier ()
 model.load_model(path3)
 
-BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+BS = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" # bootstrap for design
 # Initialize the app
 app = dash.Dash (__name__, external_stylesheets=[BS], suppress_callback_exceptions=True, update_title='Loading...',
                  meta_tags=[{ 'name': 'viewport',
@@ -48,27 +50,28 @@ app = dash.Dash (__name__, external_stylesheets=[BS], suppress_callback_exceptio
 server = app.server
 app.config.suppress_callback_exceptions = True
 
+# add favicon
 app._favicon = ("assets/favicon.ico")
 
+# to add SHAP images
 image_filename_1 = 'summary_plot3.png'  # replace with your own image
 encoded_image_1 = base64.b64encode (open (image_filename_1, 'rb').read ())
 image_filename_2 = 'summary_plot4.png'  # replace with your own image
 encoded_image_2 = base64.b64encode (open (image_filename_2, 'rb').read ())
 
-
+# Now, for decrease the dimension of the dashboard, we use Flask-Cache capability
 cache = Cache (app.server, config={
     # Note that filesystem cache doesn't work on systems with ephemeral
     # filesystems like Heroku.
     'CACHE_TYPE': 'filesystem',
     'CACHE_DIR': 'cache-directory',
-
     # should be equal to maximum number of users on the app at a single time
     # higher numbers will store more data in the filesystem / redis cache
     'CACHE_THRESHOLD': 200
 })
 TIMEOUT = 300
 
-
+# get request with FLASK API, this function is getting all of the dataset for comparing the clients with the others
 @cache.memoize (timeout=TIMEOUT)
 def query_data():
     # This approach works well if there is one dataset that is used to update several callbacks.
@@ -83,76 +86,6 @@ def query_data():
     return total_score
 
 
-# the style arguments for the sidebar. We use position:fixed and a fixed width
-SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 12,
-    "left": 0,
-    "bottom": 0,
-    "width": "21rem",
-    "height": "100%",
-    "z-index": 1,
-    "overflow-x": "hidden",
-    "transition": "all 1s",
-    "padding": "0.5rem 1rem",
-    "background-color": "#f8f9fa",
-}
-
-SIDEBAR_HIDEN = {
-    "position": "fixed",
-    "top": 12,
-    "left": "-21rem",
-    "bottom": 0,
-    "width": "21rem",
-    "height": "100%",
-    "z-index": 1,
-    "overflow-x": "hidden",
-    "transition": "all 1s",
-    "padding": "0rem 0rem",
-    "background-color": "#f8f9fa",
-}
-
-# the styles for the main content position it to the right of the sidebar and
-# add some padding.
-CONTENT_STYLE = {
-    "transition": "margin-left .5s",
-    "margin-left": "30rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "width": "70%",
-    "transition": "all 1s"
-    # "background-color": "#f8f9fa",
-}
-
-CONTENT_STYLE_client = {
-    "margin-left": "30rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "width": "70%",
-    'visibility': 'hidden',
-    "transition": "all 1s"
-    # "background-color": "#f8f9fa",
-}
-
-CONTENT_STYLE1 = {
-    "transition": "margin-left .5s",
-    "margin-left": "1rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "width": "100%",
-    "transition": "all 1s"
-    # "background-color": "#f8f9fa",
-}
-
-CONTENT_STYLE1_client = {
-    "transition": "margin-left .5s",
-    "margin-left": "1rem",
-    "margin-right": "2rem",
-    "padding": "2rem 1rem",
-    "width": "100%",
-    "transition": "all 1s"
-    # "background-color": "#f8f9fa",
-}
 # graph capabilities
 config = { 'displayModeBar': True,
            'scrollZoom': True,
@@ -164,7 +97,8 @@ config = { 'displayModeBar': True,
                'select2d',
            ] }
 
-# sidebar explication
+# sidebar design
+
 sidebar = html.Div (
     [
         dbc.Button ("X", outline=True, color="secondary", className="mr-1", id="btn_sidebar",
@@ -203,7 +137,7 @@ sidebar = html.Div (
     id="sidebar",
     style=SIDEBAR_STYLE,
 )
-# premiére content
+# content design
 content = html.Div ([
     dbc.Button (">>", outline=True, color="secondary", className="mr-1", id="btn_sidebar2",
                 style={ "position": "fixed", "margin-left": "5px", 'visibility': 'hidden' }),
@@ -273,7 +207,7 @@ content = html.Div ([
     id="page-content",
     style=CONTENT_STYLE
 )
-# premiére content collapse explication
+# content collapse design
 collapse = html.Div (
     [
         dbc.Button (
@@ -293,7 +227,7 @@ collapse = html.Div (
     ], style=CONTENT_STYLE, id='collapse_id'
 )
 
-# explication de client partie
+# client content design
 client_content = html.Div (id="page-content_client", children=[
     html.P (
         "Données du client, demande",
@@ -363,7 +297,7 @@ client_content = html.Div (id="page-content_client", children=[
                            style=CONTENT_STYLE_client
                            )
 
-# Deuxième collapse et son explication
+# Clietn content collapse design
 collapse2 = html.Div (
     [
         dbc.Button (
@@ -384,7 +318,7 @@ collapse2 = html.Div (
     ], style=CONTENT_STYLE_client, id='collapse_id2'
 )
 
-# resultats de demande et son explication
+# resultats de demande design
 resultat_de_demande = html.Div ([
     html.P (
         "Décision sur la demande de prêt",
@@ -437,7 +371,7 @@ resultat_de_demande = html.Div ([
     style=CONTENT_STYLE_client
 )
 
-# Deuxième collapse
+# resultats de demande collapse design
 collapse3 = html.Div (
     [
         dbc.Button (
@@ -542,7 +476,7 @@ client_analyse = html.Div ([
     style=CONTENT_STYLE_client
 )
 
-# Troisième collapse
+# Troisième collapse design
 collapse4 = html.Div (
     [
         dbc.Button (
@@ -564,6 +498,7 @@ collapse4 = html.Div (
 )
 
 # app layout general
+#--------------------------------------->
 app.layout = html.Div (
     [
         dcc.Location(id='url', refresh=False),
@@ -578,8 +513,9 @@ def display_page(pathname):
     if pathname == '/':
         return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
 
+#--------------------------------------->
 
-# sidebar function
+# sidebar function for X and >> buttons
 @app.callback (
     [
         Output ("sidebar", "style"),
@@ -618,7 +554,7 @@ def toggle_sidebar(n, n1, nclick, hidden):
         return sidebar_style, content_style, cur_nclick, { 'visibility': 'hidden' }, CONTENT_STYLE, hidden
 
 
-# first datatable function
+# for the first datatable function
 @app.callback (
     Output ('datatable-interactivity', 'style_data_conditional'),
     Input ('datatable-interactivity', 'selected_columns')
@@ -630,7 +566,7 @@ def update_styles(selected_columns):
     } for i in selected_columns]
 
 
-# les features choisées s'affichent depuis la datatable contenu
+# les features choosen show when datatable contents change
 @app.callback (
     Output ('datatable-interactivity', 'columns'),
     Input ('features', 'value')
@@ -662,7 +598,6 @@ def toggle_collapse2(n, is_open):
         return not is_open
     return is_open
 
-
 # collapse overture/fermeture function
 @app.callback (
     Output ("collapse3", "is_open"),
@@ -673,7 +608,6 @@ def toggle_collapse3(n, is_open):
     if n:
         return not is_open
     return is_open
-
 
 # collapse overture/fermeture function
 @app.callback (
@@ -706,7 +640,6 @@ def update_table_client_visibility(tick1, cl_id, sd1, sd2):
             return CONTENT_STYLE1_client, CONTENT_STYLE1_client
         marge = { "margin-left": "30rem", 'visibility': 'visible' }
         return marge, marge
-
 
 @app.callback (
 
@@ -769,6 +702,7 @@ def update_table_client(client_id, sel_col):
                                                   sel_col]
 
 
+# add waterfall graph
 @app.callback (Output ('graph_client_waterfall', 'figure'),
                Input ('pret_id', 'value'),
                Input ('features_client', 'value'))
@@ -880,7 +814,7 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
 
     return value1, value2, value3, score, score, color, color, col, fig, shap_html_1,shap_html_2
 
-
+# add bivarie graph side
 @app.callback (
     Output ('bivarie_graph', 'figure'),
     [Input ('first_par', 'value'), Input ('second_par', 'value')],
@@ -931,7 +865,7 @@ def result_client2(f1, f2, feat_cl, client_id):
     else:
         return no_update
 
-
+# add univarie graph side
 @app.callback (
     Output ('uni_first_par', 'multi'),
     Output ('uni_first_par', 'value'),
