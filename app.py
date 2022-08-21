@@ -336,7 +336,7 @@ resultat_de_demande = html.Div ([
             id='décision3'),
 
     html.Div (children=[daq.Gauge (
-        color={ "gradient": True, "ranges": { "green": [0, 80], "yellow": [80, 90], "red": [90, 100] } },
+        color={ "gradient": True, "ranges": { "green": [0, 50], "yellow": [50, 60], "red": [60, 100] } },
         value=0,
         label='Score (%)',
         max=100,
@@ -387,11 +387,11 @@ collapse3 = html.Div (
                     "Le retour de l'API de prédiction donne un score entre 0 et 100% qui représente la probabilité de "
                     "refus de prêt."),
                 html.H3 ("Trois cas de figure sont alors possibles:"),
-                html.P ("1) Le score est en dessous de 90% → la demande de prêt est acceptée."),
+                html.P ("1) Le score est en dessous de 50% → la demande de prêt est acceptée."),
                 html.P (
-                    "2) Le score est entre 90 et 92% → la demande de prêt est refusée mais peut être discutée avec le "
+                    "2) Le score est entre 50 et 60% → la demande de prêt est refusée mais peut être discutée avec le "
                     "conseiller"),
-                html.P ("3) Le score est au dessus de 92% → la demande de prêt est refusée..")])),
+                html.P ("3) Le score est au dessus de 61% → la demande de prêt est refusée..")])),
             id="collapse3",
             is_open=False,
         ),
@@ -764,11 +764,11 @@ def result_client(feat_cl, client_id):  # sourcery no-metrics
 
     value1 = f"Demande de prêt ID: '{client_id}'"
     value2 = f"Probabilité de défaut de remboursement: {score:,.2f}%"
-    if score > 92:
+    if score > 61:
         value3 = 'Demande de prêt réfusé'
         color = { 'color': 'red' }
         col = 'red'
-    elif 90 <= score <= 92:
+    elif 50 <= score <= 60:
         value3 = 'il faut discuter avec le conseiller'
         color = { 'color': 'grey' }
         col = 'grey'
