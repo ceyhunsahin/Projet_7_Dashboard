@@ -894,25 +894,38 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
         if type_gr == 'Boxplot':
 
             for idx, col in enumerate (total_score[uni_f1].columns, 0):
-                for ind, pre in enumerate (total_score['Predict'].unique ()):
+                #for ind, pre in enumerate (total_score['Predict'].unique ()):
 
 
 
-                    val = total_score[total_score.index == str (client_id)]['Predict'].values
+                val = total_score[total_score.index == str (client_id)]['Predict'].values
+                print(val)
 
-                    df_plot_acc = total_score[total_score['Predict'] == pre]
-                    if val == pre :
-                        fig3.add_trace (
-                            go.Scatter (x=[col], y=df_plot_acc[df_plot_acc.index == str (client_id)][col],
-                                        name=f"{client_id}"))
+                df_plot_acc1 = total_score[total_score['Predict'] == 0]
+                df_plot_acc2 = total_score[total_score['Predict'] == 1]
+                situation = ''
+                if val[0] == 0 :
+                    situation = 'Refusée'
 
-                        fig3.add_trace (go.Box (y=df_plot_acc[col], name=f"{col}"))
-                        fig3.update_layout (boxmode='overlay', xaxis_tickangle=0,
-                                            title = 'Tous les clients par rapport au acceptées et refusées',
-                                            yaxis_title = 'Valeurs Normalisée', xaxis_title = 'Features')
+                    fig3.add_trace (
+                        go.Scatter (x=[col], y=df_plot_acc1[df_plot_acc1.index == str (client_id)][col],
+                                    name=f"{client_id} : Acceptée"))
+                    fig3.add_trace (go.Box (y=df_plot_acc1[col], name=f"{col}"))
+                    fig3.update_layout (boxmode='overlay', boxgroupgap=0.1)
+                    fig3.add_trace (go.Box (y=df_plot_acc2[col], name=f"{col}: {situation}"))
 
-                    else :
-                        fig3.add_trace (go.Box (y=df_plot_acc[col], name=f"{col}: Refusée" ))
+                else :
+                    situation = 'Acceptée'
+                    fig3.add_trace (
+                        go.Scatter (x=[col], y=df_plot_acc2[df_plot_acc2.index == str (client_id)][col],
+                                    name=f"{client_id} : Refusée"))
+                    fig3.add_trace (go.Box (y=df_plot_acc2[col], name=f"{col}"))
+                    fig3.update_layout (boxmode='overlay', boxgroupgap=0.1)
+                    fig3.add_trace (go.Box (y=df_plot_acc1[col], name=f"{col} : {situation}"))
+
+            fig3.update_layout (boxmode='overlay', xaxis_tickangle=0,
+                                title='Tous les clients par rapport au acceptées et refusées',
+                                yaxis_title='Valeurs Normalisée', xaxis_title='Features')
 
             return fig3
 
