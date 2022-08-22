@@ -5,7 +5,7 @@ Here is a summary of folder available on it:
 It contains all the developpement work for the dashboard (dash plotly code + design.py + assets + csv file + 
 json files(for xgboost model) + png files + requirements.txt).
 
-Dashboard is available on site: [Link to Google](https://oc-dashboard-home-risk.herokuapp.com/)
+Dashboard is available on site: [Dashboard](https://oc-dashboard-home-risk.herokuapp.com/)
 
 For work on Dashboard, it needs to open Flask-API repostory which was explained in another repo [Projet7_Flask_API](https://pages.github.com/).
 
