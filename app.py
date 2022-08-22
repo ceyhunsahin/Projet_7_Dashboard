@@ -648,7 +648,7 @@ def toggle_collapse4(n, is_open):
     if n:
         return not is_open
     return is_open
-
+# collapse overture/fermeture function
 @app.callback (
     Output ("collapse5", "is_open"),
     [Input ("collapse-button5", "n_clicks")],
@@ -659,6 +659,7 @@ def toggle_collapse5(n, is_open):
         return not is_open
     return is_open
 
+# when sidebar was cleaned
 @app.callback (
 
     [Output ('page-content_client', 'style'), Output ("collapse_id2", "style")],
@@ -745,6 +746,7 @@ def update_analyse_visibility_collapse5(tick1, cl_id, sd1, sd2):
     else:
         return no_update
 
+# add features to datatable
 @app.callback (
     [Output ('client_id', 'children'),
      Output ('datatable-interactivity_client', 'data'),
