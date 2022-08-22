@@ -7,7 +7,7 @@ json files(for xgboost model) + png files + requirements.txt).
 
 Dashboard is available on site: [Dashboard](https://oc-dashboard-home-risk.herokuapp.com/)
 
-For work on Dashboard, it needs to open Flask-API repostory which was explained in another repo [Projet7_Flask_API]([https://pages.github.com/](https://github.com/ceyhunsahin/Projet7_Flask_API)).
+For work on Dashboard, it needs to open Flask-API repostory which was explained in another repo [Projet7_Flask_API](https://github.com/ceyhunsahin/Projet7_Flask_API).
 
 Please note that it was created specific github repository for deployment on Heroku:
 
