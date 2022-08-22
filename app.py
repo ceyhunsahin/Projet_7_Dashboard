@@ -398,6 +398,49 @@ collapse3 = html.Div (
     ], style=CONTENT_STYLE_client, id='collapse_id3'
 )
 
+# Troisième collapse design
+collapse4 = html.Div (
+    [
+        dbc.Button (
+            "Informations Complémentaire",
+            id="collapse-button4",
+            className="mb-3",
+            color="primary",
+            n_clicks=0,
+        ),
+        dbc.Collapse (
+            dbc.Card (dbc.CardBody ([
+                html.P (
+                    "Ce graphique permet d'afficher un nuage de points en fonction de deux features sélectionnables."),
+                html.P (" Le code couleur indique la valeur du score client.")])),
+            id="collapse4",
+            is_open=False,
+        ),
+    ], style=CONTENT_STYLE_client, id='collapse_id4'
+)
+
+# Troisième collapse design
+collapse5 = html.Div (
+    [
+        dbc.Button (
+            "Informations Complémentaire",
+            id="collapse-button5",
+            className="mb-3",
+            color="primary",
+            n_clicks=0,
+        ),
+        dbc.Collapse (
+            dbc.Card (dbc.CardBody ([
+                html.P (
+                    "Pour Histogramme : Histogramme permet d'afficher les distributions des groupes de clients."),
+                html.P ("Pour Boxplot : Boxplot permet d\'afficher les distributions des groupes de clients en fonction de la valeur du client selectionne. \n"
+                        " Notez que les variables sont normalisees afin d\'avoir une image de la situation de notre client \n"
+                        " par rapport aux autres groupes de clients.")])),
+            id="collapse5",
+            is_open=False,
+        ),
+    ], style=CONTENT_STYLE_client, id='collapse_id5'
+)
 # analise de client et son explication par rapport aux 2 features
 client_analyse = html.Div ([
     html.H2 ([
@@ -430,7 +473,10 @@ client_analyse = html.Div ([
 
     dcc.Loading (id='bivarie_graph_loading', type='cube',
                  children=[html.Div (dcc.Graph (id='bivarie_graph', config=config, style={'height' : 700}), )]),
+    ],    id="cl_analy",
+          style=CONTENT_STYLE_client)
 
+client_analyse_uni = html.Div([
     html.H2 ([
         html.I ("Analyse univariée")],
         style={ 'margin': '1rem', 'font-size': '30px', 'font-family': 'Arial, Helvetica, sans-serif',
@@ -453,6 +499,7 @@ client_analyse = html.Div ([
                         ],
               ),
 
+
     html.Div (children=[dcc.Dropdown (id='uni_first_par',
                                       options=[{ 'label': i, 'value': i } for i in
                                                df_test.columns],
@@ -472,30 +519,11 @@ client_analyse = html.Div ([
                  children=[html.Div (dcc.Graph (id='univarie_graph', config=config,style={'height' : 700}), )]),
 ],
 
-    id="cl_analy",
+    id="cl_analy_uni",
     style=CONTENT_STYLE_client
 )
 
-# Troisième collapse design
-collapse4 = html.Div (
-    [
-        dbc.Button (
-            "Informations Complémentaire",
-            id="collapse-button4",
-            className="mb-3",
-            color="primary",
-            n_clicks=0,
-        ),
-        dbc.Collapse (
-            dbc.Card (dbc.CardBody ([
-                html.P (
-                    "Ce graphique permet d'afficher un nuage de points en fonction de deux features sélectionnables."),
-                html.P (" Le code couleur indique la valeur du score client.")])),
-            id="collapse4",
-            is_open=False,
-        ),
-    ], style=CONTENT_STYLE_client, id='collapse_id4'
-)
+
 
 # app layout general
 #--------------------------------------->
@@ -511,7 +539,8 @@ app.layout = html.Div (
               Input('url', 'pathname'))
 def display_page(pathname):
     if pathname == '/':
-        return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,client_analyse,collapse4,
+        return sidebar,content,collapse,client_content,collapse2,resultat_de_demande,collapse3,\
+               client_analyse,collapse4,client_analyse_uni,collapse5
 
 #--------------------------------------->
 
@@ -620,6 +649,15 @@ def toggle_collapse4(n, is_open):
         return not is_open
     return is_open
 
+@app.callback (
+    Output ("collapse5", "is_open"),
+    [Input ("collapse-button5", "n_clicks")],
+    [State ("collapse5", "is_open")],
+)
+def toggle_collapse5(n, is_open):
+    if n:
+        return not is_open
+    return is_open
 
 @app.callback (
 
@@ -685,6 +723,27 @@ def update_analyse_visibility(tick1, cl_id, sd1, sd2):
     else:
         return no_update
 
+@app.callback (
+
+    [Output ('cl_analy_uni', 'style'), Output ("collapse_id5", "style")],
+    [Input ('stades_client', 'value'), Input ('pret_id', 'value'),
+     Input ("btn_sidebar", "n_clicks"), Input ("btn_sidebar2", "n_clicks")], )
+def update_analyse_visibility_collapse5(tick1, cl_id, sd1, sd2):
+    if cl_id == None:
+        raise PreventUpdate
+    q2 = dash.callback_context.triggered[0]["prop_id"].split (".")[0]
+    if cl_id != None:
+        if not tick1:
+            return CONTENT_STYLE_client, CONTENT_STYLE_client
+
+        if 'analyse_client' not in tick1:
+            return CONTENT_STYLE_client, CONTENT_STYLE_client
+        if q2 == 'btn_sidebar':
+            return CONTENT_STYLE1_client, CONTENT_STYLE1_client
+        marge = { "margin-left": "30rem", 'visibility': 'visible' }
+        return marge, marge
+    else:
+        return no_update
 
 @app.callback (
     [Output ('client_id', 'children'),
@@ -894,12 +953,8 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
         if type_gr == 'Boxplot':
 
             for idx, col in enumerate (total_score[uni_f1].columns, 0):
-                #for ind, pre in enumerate (total_score['Predict'].unique ()):
-
-
 
                 val = total_score[total_score.index == str (client_id)]['Predict'].values
-                print(val)
 
                 df_plot_acc1 = total_score[total_score['Predict'] == 0]
                 df_plot_acc2 = total_score[total_score['Predict'] == 1]
@@ -929,14 +984,12 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
 
             return fig3
 
-
-
         else :
             total_score['Acc_Ref'] = np.where(total_score['Predict']==0, 'Acceptée','Refusée')
             fig4 = px.histogram(total_score, x=uni_f1, color="Acc_Ref", marginal="rug",
                                 color_discrete_sequence = ['blue','red'],
                                 )
-            #fig4.add_trace (go.Histogram(x=df_plot[uni_f1], name=f"{uni_f1}"))
+
             fig4.add_trace (go.Histogram (x=total_score[total_score.index == str (client_id)][uni_f1],
 
                                         name=f"{uni_f1} : {client_id}",marker  = { 'color' : '#330C73' }))
