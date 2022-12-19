@@ -34,7 +34,7 @@ df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
 # Sample 1200 for df_test_normalize
 df_test_normalize = pd.read_csv (path2, index_col=0)
-df_test_normalize = df_test_normalize.sample(1200, random_state=42)
+df_test_normalize = df_test_normalize.sample(800, random_state=42)
 
 # import model
 model = xgb.XGBClassifier ()
@@ -1006,4 +1006,4 @@ def univarie_graph(uni_f1, feat_cl, client_id, type_gr):
 
 
 if __name__ == '__main__':
-    app.run_server (port=8051, debug=False)
+    app.run_server (port=8050, debug=False)
