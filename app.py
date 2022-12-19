@@ -26,15 +26,15 @@ path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/
 path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
 path3 = 'pipeline_housing.json'
 
-# Sample 800 for df_test
+# Sample 700 for df_test
 df_test = pd.read_csv(path, encoding='unicode_escape')
-df_test = df_test.sample(800, random_state=42)
+df_test = df_test.sample(700, random_state=42)
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
 # Sample 1200 for df_test_normalize
 df_test_normalize = pd.read_csv (path2, index_col=0)
-df_test_normalize = df_test_normalize.sample(800, random_state=42)
+df_test_normalize = df_test_normalize.sample(700, random_state=42)
 
 # import model
 model = xgb.XGBClassifier ()
