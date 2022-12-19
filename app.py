@@ -26,7 +26,7 @@ path = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/
 path2 = 'https://raw.githubusercontent.com/ceyhunsahin/Projet_7_Dashboard/master/Projet_File/test_sample_data_home_risk_normalise.csv'
 path3 = 'pipeline_housing.json'
 
-# Sample 1200 for df_test
+# Sample 800 for df_test
 df_test = pd.read_csv(path, encoding='unicode_escape')
 df_test = df_test.sample(800, random_state=42)
 
