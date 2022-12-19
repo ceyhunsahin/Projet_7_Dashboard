@@ -28,7 +28,7 @@ path3 = 'pipeline_housing.json'
 
 # Sample 1200 for df_test
 df_test = pd.read_csv(path, encoding='unicode_escape')
-df_test = df_test.sample(1200, random_state=42)
+df_test = df_test.sample(800, random_state=42)
 
 df_test = df_test.loc[:, ~df_test.columns.str.match ('Unnamed')]
 df_test = df_test.sort_values ('SK_ID_CURR')
