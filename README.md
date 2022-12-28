@@ -18,6 +18,10 @@ For Docker, it can be type your shell:
 
 `docker container run -p 8000:8000 csahin2086/dash_app`
 
+and with another shell:
+
+`docker container run -p 5000:5000 csahin2086/flask_app`
+
 For work on Dashboard, it needs to open Flask-API repostory which was explained in another repo [Projet7_Flask_API](https://github.com/ceyhunsahin/Projet7_Flask_API).
 
 Please note that it was created specific github repository for deployment on Heroku:
