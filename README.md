@@ -14,11 +14,9 @@ json files(for xgboost model) + png files + requirements.txt).
 
 Dashboard is available on site: [Dashboard](https://oc-dashboard-home-risk.herokuapp.com/)
 
-For Docker, it can be type directly :
+For Docker, it can be type your shell:
 
-'''
-docker container run -p 8000:8000 csahin2086/dash_app
-'''
+`docker container run -p 8000:8000 csahin2086/dash_app`
 
 For work on Dashboard, it needs to open Flask-API repostory which was explained in another repo [Projet7_Flask_API](https://github.com/ceyhunsahin/Projet7_Flask_API).
 
