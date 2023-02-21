@@ -12,8 +12,7 @@ Here is a summary of folder available on it:
 It contains all the developpement work for the dashboard (dash plotly code + design.py + assets + csv file + 
 json files(for xgboost model) + png files + requirements.txt).
 
-Dashboard is available on site: [Dashboard](https://oc-dashboard-home-risk.herokuapp.com/), as the free dynos and services was shut down  
-by heroku, dashboard and flask api was deployed to the docker hub. 
+Dashboard is available on site: [Dashboard](https://oc-dashboard-home-risk.herokuapp.com/), as the free dynos and services was shut down by heroku, dashboard and flask api was deployed to the docker hub. 
 
 For Docker, it can be type your shell:
 
